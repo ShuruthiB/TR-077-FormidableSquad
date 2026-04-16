@@ -26,7 +26,7 @@ async function startServer() {
     try {
       const lat = req.query.lat || "11.4102";
       const lon = req.query.lon || "76.695";
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relativehumidity_2m,windspeed_10m,shortwave_radiation&timezone=Asia/Kolkata&forecast_days=1&current_weather=true`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,shortwave_radiation&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,shortwave_radiation&timezone=Asia/Kolkata&forecast_days=1&wind_speed_unit=kmh`;
       const response = await fetch(url);
       const data = await response.json();
       res.json(data);

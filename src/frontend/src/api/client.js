@@ -10,6 +10,10 @@ const client = axios.create({
   }
 });
 
+export const searchLocation = (query) => {
+  return axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`);
+};
+
 export const getHealth = () => client.get('/health');
 export const getLiveWeather = (lat, lon) => {
   const params = lat && lon ? `?lat=${lat}&lon=${lon}` : '';

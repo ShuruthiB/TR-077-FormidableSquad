@@ -1,11 +1,15 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Info } from 'lucide-react';
 
-const MetricsTable = () => {
+interface MetricsTableProps {
+  currentHorizon: string;
+}
+
+const MetricsTable: React.FC<MetricsTableProps> = ({ currentHorizon }) => {
   const metrics = [
-    { horizon: '1h Forecast', rmse: 14.22, mae: 10.84, improvement: '-12.4%', status: 'better' },
-    { horizon: '3h Forecast', rmse: 28.51, mae: 19.10, improvement: '-8.2%', status: 'better' },
-    { horizon: '24h Forecast', rmse: 52.30, mae: 41.12, improvement: '-2.1%', status: 'stable' },
+    { id: '1h', horizon: '1h Forecast', rmse: 14.22, mae: 10.84, improvement: '-12.4%', status: 'better' },
+    { id: '3h', horizon: '3h Forecast', rmse: 28.51, mae: 19.10, improvement: '-8.2%', status: 'better' },
+    { id: '24h', horizon: '24h Forecast', rmse: 52.30, mae: 41.12, improvement: '-2.1%', status: 'stable' },
   ];
 
   return (
@@ -20,8 +24,15 @@ const MetricsTable = () => {
       </thead>
       <tbody>
         {metrics.map((m) => (
-          <tr key={m.horizon} className="border-b border-border/40">
-            <td className="py-3 text-[13px] text-text-main font-semibold">{m.horizon}</td>
+          <tr key={m.horizon} className={`border-b border-border/40 transition-colors ${
+            currentHorizon === m.id ? 'bg-accent-blue/10' : ''
+          }`}>
+            <td className="py-3 text-[13px] text-text-main font-semibold">
+              <div className="flex items-center gap-2">
+                {currentHorizon === m.id && <div className="w-1.5 h-1.5 rounded-full bg-accent-blue" />}
+                {m.horizon}
+              </div>
+            </td>
             <td className="py-3 text-[13px] text-text-main font-mono">{m.rmse.toFixed(2)}</td>
             <td className="py-3 text-[13px] text-text-main font-mono">{m.mae.toFixed(2)}</td>
             <td className={`py-3 text-[13px] font-bold ${

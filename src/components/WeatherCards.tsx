@@ -58,15 +58,14 @@ const WeatherCards: React.FC<WeatherCardsProps> = ({ data }) => {
     </div>
   );
 
-  const current = data.current_weather;
-  const hourly = data.hourly;
-  const nowIdx = new Date().getHours();
+  const current = data.current;
+  if (!current) return <div className="text-rose-500 p-4">No current weather data available</div>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
       <WeatherCard 
         title="Temperature"
-        value={current.temperature}
+        value={current.temperature_2m}
         unit="°C"
         trend="stable"
         icon={Cloud}
@@ -74,15 +73,15 @@ const WeatherCards: React.FC<WeatherCardsProps> = ({ data }) => {
       />
       <WeatherCard 
         title="Wind Speed"
-        value={current.windspeed}
-        unit="m/s"
+        value={current.wind_speed_10m}
+        unit="km/h"
         trend="up"
         icon={Wind}
         lastUpdated={new Date().toLocaleTimeString('en-IN', { hour12: false })}
       />
       <WeatherCard 
         title="Solar Irradiance"
-        value={hourly.shortwave_radiation[nowIdx] || 0}
+        value={current.shortwave_radiation}
         unit="W/m²"
         trend="down"
         icon={Sun}
@@ -90,7 +89,7 @@ const WeatherCards: React.FC<WeatherCardsProps> = ({ data }) => {
       />
       <WeatherCard 
         title="Humidity"
-        value={hourly.relativehumidity_2m[nowIdx] || 0}
+        value={current.relative_humidity_2m}
         unit="%"
         trend="stable"
         icon={Droplets}

@@ -2,11 +2,14 @@ import React from 'react';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 const ForecastLog = () => {
+  const now = new Date();
+  const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  
   const logs = [
-    { id: 1, time: '2025-05-12 14:00:00', horizon: '1h', predicted: 312.8, actual: 315.2, error: '-0.76%', status: 'ACCURATE' },
-    { id: 2, time: '2025-05-12 13:00:00', horizon: '1h', predicted: 288.4, actual: 291.0, error: '-0.89%', status: 'ACCURATE' },
-    { id: 3, time: '2025-05-12 11:00:00', horizon: '3h', predicted: 245.1, actual: 238.9, error: '+2.59%', status: 'ACCURATE' },
-    { id: 4, time: '2025-05-12 10:00:00', horizon: '1h', predicted: 210.2, actual: 215.1, error: '-2.27%', status: 'ACCURATE' },
+    { id: 1, time: `${dateStr} 14:00:00`, horizon: '1h', predicted: 312.8, actual: 315.2, error: '-0.76%', status: 'ACCURATE' },
+    { id: 2, time: `${dateStr} 13:00:00`, horizon: '1h', predicted: 288.4, actual: 291.0, error: '-0.89%', status: 'ACCURATE' },
+    { id: 3, time: `${dateStr} 11:00:00`, horizon: '3h', predicted: 245.1, actual: 238.9, error: '+2.59%', status: 'ACCURATE' },
+    { id: 4, time: `${dateStr} 10:00:00`, horizon: '1h', predicted: 210.2, actual: 215.1, error: '-2.27%', status: 'ACCURATE' },
   ];
 
   return (

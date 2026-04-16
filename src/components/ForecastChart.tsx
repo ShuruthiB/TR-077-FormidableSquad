@@ -20,7 +20,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ data, horizon }) => {
   return (
     <div className="w-full h-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
           <defs>
             <linearGradient id="colorPred" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#22C55E" stopOpacity={0.1}/>
@@ -38,14 +38,17 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ data, horizon }) => {
             fontSize={10} 
             tickLine={false} 
             axisLine={false}
-            tickFormatter={(str) => str.split(' ')[1]}
+            dy={10}
+            label={{ value: 'Time (Hours)', position: 'insideBottom', offset: -20, fontSize: 11, fill: '#94A3B8', fontWeight: 600 }}
           />
           <YAxis 
             stroke="#94A3B8" 
             fontSize={10} 
             tickLine={false} 
             axisLine={false}
-            tickFormatter={(val) => `${val}`}
+            dx={-10}
+            label={{ value: 'Energy (kWh)', angle: -90, position: 'insideLeft', offset: 0, fontSize: 11, fill: '#94A3B8', fontWeight: 600 }}
+            tickFormatter={(val) => `${Math.round(val)}`}
           />
           <Tooltip 
             contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #334155', borderRadius: '4px', fontSize: '12px' }}
@@ -72,23 +75,6 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ data, horizon }) => {
             fill="url(#colorPred)" 
             name="Predicted"
             animationDuration={1000}
-          />
-          
-          {/* Uncertainty Band */}
-          <Area
-            type="monotone"
-            dataKey="upper"
-            stroke="none"
-            fill="#22C55E"
-            fillOpacity={0.1}
-            name="Interval"
-          />
-          <Area
-            type="monotone"
-            dataKey="lower"
-            stroke="none"
-            fill="#22C55E"
-            fillOpacity={0.1}
           />
         </AreaChart>
       </ResponsiveContainer>

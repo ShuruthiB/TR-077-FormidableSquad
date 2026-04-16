@@ -1,200 +1,91 @@
-# 🌱 Renewable Energy Forecasting System
+# ⚡ Renewable Energy Forecasting System — Ooty, India
 
-## 📌 Overview
+A production-ready hybrid solar-wind energy forecasting system designed for the unique climate of Ooty, Tamil Nadu. This system uses a stacking ensemble of XGBoost and LSTM models to provide accurate energy generation predictions.
 
-The **Renewable Energy Forecasting System** is a full-stack application designed to predict renewable energy generation using advanced machine learning models. It combines data processing, predictive analytics, and a modern web interface to provide accurate and insightful energy forecasts.
+## 🌍 Location Context
+- **Primary location:** Ooty, Tamil Nadu, India (Lat: 11.4102° N, Lon: 76.6950° E)
+- **Energy asset:** Solar (500kW) + Wind (1200kW) hybrid plant.
+- **Timezone:** Asia/Kolkata (IST, UTC+5:30)
 
-This project showcases integration of **Machine Learning, Backend APIs, and Frontend Visualization** in a real-world application.
-
----
-
-## 🚀 Features
-
-* 📊 Renewable energy prediction using ML models (LSTM, XGBoost)
-* ⚡ Real-time forecasting via API integration
-* 📈 Interactive dashboard with charts and metrics
-* 🧠 Data preprocessing and model training pipeline
-* 🗂️ Forecast logs and performance tracking
-* 🐳 Docker support for easy deployment
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-* React.js
-* TypeScript
-* Vite
-* CSS
-
-### Backend
-
-* Node.js
-* Express.js
-
-### Machine Learning
-
-* Python
-* TensorFlow / Keras (LSTM)
-* XGBoost / LightGBM
-
-### Database
-
-* SQL / JSON-based storage
-
-### DevOps
-
-* Docker
-* Docker Compose
-
----
-
-## 📁 Project Structure
-
-```bash
-renewable-energy-forecast-system/
-│
+## 📁 Repository Structure
+```
+renewable-energy-forecast/
+├── data/                       # Raw and processed energy data
 ├── src/
-│   ├── components/        # UI Components
-│   ├── models/            # ML models (LSTM, XGBoost)
-│   ├── preprocessing/     # Data processing pipeline
-│   ├── api/               # Python API
-│   └── main.tsx           # Frontend entry point
-│
-├── scripts/               # Training & data generation scripts
-├── notebooks/             # Experiment notebooks
-├── tests/                 # Unit tests
-├── server.ts              # Backend server
-├── docker-compose.yml     # Docker setup
-├── package.json           # Node dependencies
-├── requirements-backend.txt # Python dependencies
-└── README.md              # Documentation
+│   ├── preprocessing/          # Feature engineering & data pipelines
+│   ├── models/                 # XGBoost, LSTM, and Meta-Learner code
+│   ├── api/                    # FastAPI backend
+│   └── frontend/               # React dashboard (Vite)
+├── scripts/                    # Training and data generation scripts
+├── artifacts/                  # Saved models and scalers
+├── Dockerfile.backend
+├── Dockerfile.frontend
+└── docker-compose.yml
 ```
 
----
+## 🚀 Quick Start (Docker)
 
-## ⚙️ Installation & Setup
-
-### 1️⃣ Clone Repository
-
-```bash
-git clone <repo-link>
-cd renewable-energy-forecast-system
-```
-
----
-
-### 2️⃣ Install Node Dependencies
-
-```bash
-npm install
-```
-
----
-
-### 3️⃣ Run Frontend & Backend
-
-```bash
-npm run dev
-```
-
----
-
-### 4️⃣ Setup Python Backend
-
-```bash
-pip install -r requirements-backend.txt
-python src/api/main.py
-```
-
----
-
-### 5️⃣ Train Machine Learning Models
-
-```bash
-python scripts/train.py
-```
-
----
-
-### 6️⃣ Run Using Docker (Optional)
-
-```bash
-docker-compose up --build
-```
-
----
-
-## 📊 Usage
-
-1. Start backend and frontend servers
-2. Open browser at:
-
+1. **Clone and Build:**
+   ```bash
+   docker-compose up --build
    ```
-   http://localhost:5173
+
+2. **Access the Dashboard:**
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+3. **Access the API Docs:**
+   Open [http://localhost:8000/docs](http://localhost:8000/docs).
+
+## 🛠 Manual Setup
+
+1. **Install Backend Dependencies:**
+   ```bash
+   pip install -r requirements-backend.txt
    ```
-3. Input or load dataset
-4. View forecasts, charts, and performance metrics
 
----
+2. **Generate Sample Data:**
+   ```bash
+   python scripts/generate_sample_data.py
+   ```
 
-## 🔐 Environment Configuration
+3. **Train Models:**
+   ```bash
+   python scripts/train.py
+   ```
 
-Create a `.env` file and configure:
+4. **Start Backend:**
+   ```bash
+   uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+   ```
 
-* API endpoints
-* Database settings
-* Model paths
+5. **Start Frontend:**
+   ```bash
+   cd src/frontend && npm install && npm run dev
+   ```
 
----
+## 🤖 Model Architecture
+- **XGBoost:** Handles tabular features and short-term lags.
+- **LSTM:** Captures long-term temporal dependencies (24h lookback).
+- **Meta-Learner:** A Ridge regression stacking layer that fuses XGBoost and LSTM predictions for final output.
 
-## 🧪 Testing
+## 🌐 API Usage Examples
 
+### Health Check
 ```bash
-pytest tests/
+curl http://localhost:8000/health
 ```
 
----
+### Single Prediction
+```bash
+curl -X POST http://localhost:8000/predict/single \
+     -H "Authorization: Bearer dev-secret-ooty-2025" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "timestamp": "2025-01-15T10:00:00+05:30",
+       "features": {"temperature": 18.5, "wind_speed": 4.2, "irradiance": 620, "humidity": 72},
+       "horizon": "3h"
+     }'
+```
 
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit changes
-4. Submit a Pull Request
-
----
-
-## 📌 Future Improvements
-
-* 🌍 Real-time weather API integration
-* 📡 IoT-based live energy data
-* ☁️ Cloud deployment (AWS/GCP/Azure)
-* 🔐 Authentication system
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## 👨‍💻 Author
-
-Developed as a full-stack + machine learning project for renewable energy forecasting.
-
----
-
-## ⭐ Acknowledgements
-
-* Open-source ML libraries
-* Renewable energy datasets
-* Developer community support
-
----
-
-
+## ✅ License
+Apache-2.0
