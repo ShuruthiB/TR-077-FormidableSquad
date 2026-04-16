@@ -1,32 +1,33 @@
-version: '3.8'
-
 services:
-  db:
-    image: timescale/timescaledb:latest-pg14
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=energy_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
-
   backend:
-    build: 
+    build:
       context: .
-      dockerfile: api/Dockerfile
+      dockerfile: Dockerfile.backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./data:/app/data
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/energy_db
-    depends_on:
-      - db
+      - JWT_SECRET=dev-secret-ooty-2025
+      - MODEL_VERSION=v1.2.0
+      - LOCATION=Ooty,Tamil Nadu,India
 
   frontend:
     build:
       context: .
-      dockerfile: frontend/Dockerfile
+      dockerfile: Dockerfile.frontend
     ports:
       - "3000:3000"
+    environment:
+      - VITE_API_BASE=http://localhost:8000
     depends_on:
       - backend
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow:/mlflow
+    command: mlflow server --host 0.0.0.0 --backend-store-uri /mlflow
