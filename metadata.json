@@ -1,0 +1,6 @@
+{
+  "name": "Renewable Energy Forecasting System",
+  "description": "A hybrid XGBoost + LSTM modeling system for real-time renewable energy prediction with a FastAPI backend and React dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

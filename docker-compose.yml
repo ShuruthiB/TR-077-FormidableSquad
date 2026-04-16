@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: timescale/timescaledb:latest-pg14
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=energy_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+
+  backend:
+    build: 
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/energy_db
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
