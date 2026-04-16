@@ -2,20 +2,20 @@
 
 ## 📌 Overview
 
-The **Renewable Energy Forecasting System** is a full-stack application designed to predict renewable energy generation using machine learning models. It integrates a modern frontend, backend APIs, and ML components to provide accurate forecasting and visualization of energy data.
+The **Renewable Energy Forecasting System** is a full-stack application designed to predict renewable energy generation using advanced machine learning models. It combines data processing, predictive analytics, and a modern web interface to provide accurate and insightful energy forecasts.
 
-This project demonstrates the use of data science, web development, and deployment tools in a unified system.
+This project showcases integration of **Machine Learning, Backend APIs, and Frontend Visualization** in a real-world application.
 
 ---
 
 ## 🚀 Features
 
-* 📊 Energy generation forecasting using Machine Learning
-* ⚡ Real-time data processing via API
-* 🌐 Interactive frontend dashboard
-* 🧠 Model training and prediction using Python
-* 🗄️ Database integration for storing energy data
-* 🐳 Docker-based deployment support
+* 📊 Renewable energy prediction using ML models (LSTM, XGBoost)
+* ⚡ Real-time forecasting via API integration
+* 📈 Interactive dashboard with charts and metrics
+* 🧠 Data preprocessing and model training pipeline
+* 🗂️ Forecast logs and performance tracking
+* 🐳 Docker support for easy deployment
 
 ---
 
@@ -23,98 +23,102 @@ This project demonstrates the use of data science, web development, and deployme
 
 ### Frontend
 
-* React (TypeScript)
+* React.js
+* TypeScript
 * Vite
 * CSS
 
 ### Backend
 
-* Node.js (TypeScript)
-* REST API
+* Node.js
+* Express.js
 
 ### Machine Learning
 
 * Python
-* Libraries (from `requirements.txt`)
+* TensorFlow / Keras (LSTM)
+* XGBoost / LightGBM
 
 ### Database
 
-* SQL (via `setup.sql`)
+* SQL / JSON-based storage
 
 ### DevOps
 
-* Docker & Docker Compose
+* Docker
+* Docker Compose
 
 ---
 
 ## 📁 Project Structure
 
-```
-renewable-energy-forecasting-system/
+```bash
+renewable-energy-forecast-system/
 │
-├── src/                # Frontend React code
-├── api/                # Python backend API
-├── ml/                 # Machine Learning model training
-├── db/                 # Database setup scripts
-├── server.ts           # Node.js backend server
-├── index.html          # Entry HTML file
-├── docker-compose.yml  # Docker configuration
-├── package.json        # Node dependencies
-└── README.md           # Project documentation
+├── src/
+│   ├── components/        # UI Components
+│   ├── models/            # ML models (LSTM, XGBoost)
+│   ├── preprocessing/     # Data processing pipeline
+│   ├── api/               # Python API
+│   └── main.tsx           # Frontend entry point
+│
+├── scripts/               # Training & data generation scripts
+├── notebooks/             # Experiment notebooks
+├── tests/                 # Unit tests
+├── server.ts              # Backend server
+├── docker-compose.yml     # Docker setup
+├── package.json           # Node dependencies
+├── requirements-backend.txt # Python dependencies
+└── README.md              # Documentation
 ```
 
 ---
 
 ## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the Repository
+### 1️⃣ Clone Repository
 
 ```bash
-git clone <your-repo-link>
-cd renewable-energy-forecasting-system
+git clone <repo-link>
+cd renewable-energy-forecast-system
 ```
 
 ---
 
-### 2️⃣ Setup Frontend & Backend
+### 2️⃣ Install Node Dependencies
 
 ```bash
 npm install
+```
+
+---
+
+### 3️⃣ Run Frontend & Backend
+
+```bash
 npm run dev
 ```
 
 ---
 
-### 3️⃣ Setup Python API
+### 4️⃣ Setup Python Backend
 
 ```bash
-cd api
-pip install -r requirements.txt
-python main.py
+pip install -r requirements-backend.txt
+python src/api/main.py
 ```
 
 ---
 
-### 4️⃣ Train ML Model
+### 5️⃣ Train Machine Learning Models
 
 ```bash
-cd ml
-python train.py
+python scripts/train.py
 ```
 
 ---
 
-### 5️⃣ Setup Database
-
-* Run the SQL script:
-
-```sql
-db/setup.sql
-```
-
----
-
-### 6️⃣ Run with Docker (Optional)
+### 6️⃣ Run Using Docker (Optional)
 
 ```bash
 docker-compose up --build
@@ -124,19 +128,32 @@ docker-compose up --build
 
 ## 📊 Usage
 
-* Start the backend and frontend servers
-* Access the application via browser (usually `http://localhost:5173`)
-* Input data or use existing dataset
-* View predictions and analytics on the dashboard
+1. Start backend and frontend servers
+2. Open browser at:
+
+   ```
+   http://localhost:5173
+   ```
+3. Input or load dataset
+4. View forecasts, charts, and performance metrics
 
 ---
 
-## 🔐 Environment Variables
+## 🔐 Environment Configuration
 
-Create a `.env` file based on `.env.example` and configure:
+Create a `.env` file and configure:
 
-* Database credentials
-* API keys (if any)
+* API endpoints
+* Database settings
+* Model paths
+
+---
+
+## 🧪 Testing
+
+```bash
+pytest tests/
+```
 
 ---
 
@@ -145,18 +162,18 @@ Create a `.env` file based on `.env.example` and configure:
 Contributions are welcome!
 
 1. Fork the repository
-2. Create a new branch
-3. Make your changes
+2. Create a feature branch
+3. Commit changes
 4. Submit a Pull Request
 
 ---
 
-## 📌 Future Enhancements
+## 📌 Future Improvements
 
-* Integration with real-time IoT sensors
-* Advanced forecasting models (LSTM, XGBoost)
-* Cloud deployment (AWS/GCP/Azure)
-* User authentication & role management
+* 🌍 Real-time weather API integration
+* 📡 IoT-based live energy data
+* ☁️ Cloud deployment (AWS/GCP/Azure)
+* 🔐 Authentication system
 
 ---
 
@@ -174,8 +191,10 @@ Developed as a full-stack + machine learning project for renewable energy foreca
 
 ## ⭐ Acknowledgements
 
-* Open-source libraries and frameworks
-* Machine learning community resources
+* Open-source ML libraries
+* Renewable energy datasets
+* Developer community support
 
 ---
+
 
