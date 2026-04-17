@@ -13,7 +13,8 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ currentHorizon }) => {
   ];
 
   return (
-    <table className="w-full border-collapse">
+    <div className="w-full h-full overflow-auto">
+      <table className="w-full border-collapse min-w-[320px]">
       <thead>
         <tr className="border-b border-border">
           <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2 pr-6">Horizon</th>
@@ -51,6 +52,7 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ currentHorizon }) => {
         ))}
       </tbody>
     </table>
+  </div>
   );
 };
 

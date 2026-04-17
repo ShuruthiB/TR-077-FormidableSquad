@@ -51,7 +51,8 @@ const ForecastLog = () => {
   });
 
   return (
-    <table className="w-full border-collapse">
+    <div className="w-full h-full overflow-auto">
+      <table className="w-full border-collapse min-w-[800px]">
       <thead>
         <tr className="bg-bg/20">
           <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2 px-4">Timestamp (IST)</th>
@@ -86,6 +87,7 @@ const ForecastLog = () => {
         ))}
       </tbody>
     </table>
+  </div>
   );
 };
 

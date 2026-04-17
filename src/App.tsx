@@ -40,6 +40,27 @@ const App = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [refreshTimer, setRefreshTimer] = useState(30);
 
+  // Debounced search for city recommendations
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (!searchQuery.trim() || searchQuery.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+      setIsSearching(true);
+      try {
+        const resp = await searchLocation(searchQuery);
+        setSearchResults(resp.data.results || []);
+      } catch (err) {
+        console.error("Search failed", err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400); // 400ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   useEffect(() => {
     const fetchWeather = async () => {
       try {
@@ -63,20 +84,6 @@ const App = () => {
       clearInterval(countdown);
     };
   }, [selectedLocation]);
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    setIsSearching(true);
-    try {
-      const resp = await searchLocation(searchQuery);
-      setSearchResults(resp.data.results || []);
-    } catch (err) {
-      console.error("Search failed", err);
-    } finally {
-      setIsSearching(false);
-    }
-  };
 
   const chartData = Array.from({ length: 24 }).map((_, i) => {
     const mod = (selectedLocation.lat + selectedLocation.lon) % 50;
@@ -113,25 +120,27 @@ const App = () => {
     };
   });
 
+  const assetId = `${selectedLocation.name.toLowerCase().replace(/\s+/g, '_')}_hybrid_swht_001`;
+
   return (
-    <div className="h-screen bg-bg text-text-main font-sans flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-bg text-text-main font-sans flex flex-col relative">
       {/* Header */}
-      <header className="h-[60px] bg-card-bg border-b border-border flex items-center justify-between px-6 shrink-0">
+      <header className="h-[60px] bg-card-bg/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6 shrink-0 sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <Zap className="w-5 h-5 text-accent-green" />
           <div className="leading-tight">
             <h1 className="text-base font-bold text-text-main">Renewable Energy Forecast System</h1>
-            <div className="flex items-center gap-2 relative">
-              <form onSubmit={handleSearch} className="flex items-center bg-bg/50 border border-border px-2 rounded-md h-6">
-                <Search className="w-3 h-3 text-text-dim mr-1" />
+            <div className="flex items-center gap-2 relative group-search">
+              <div className="flex items-center bg-bg/50 border border-border px-2 rounded-md h-7 transition-all focus-within:border-accent-blue focus-within:ring-1 focus-within:ring-accent-blue/30">
+                <Search className={`w-3.5 h-3.5 transition-colors ${isSearching ? 'text-accent-blue animate-pulse' : 'text-text-dim'}`} />
                 <input 
                   type="text" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search Any Indian City..."
-                  className="bg-transparent border-none text-[10px] text-text-main focus:outline-none w-32 placeholder:text-text-dim/50"
+                  placeholder="Search Global Cities (e.g. London, Tokyo)..."
+                  className="bg-transparent border-none text-[11px] text-text-main focus:outline-none w-48 ml-2 placeholder:text-text-dim/40"
                 />
-              </form>
+              </div>
               
               <AnimatePresence>
                 {searchResults.length > 0 && (
@@ -182,18 +191,18 @@ const App = () => {
         </div>
       </header>
 
-      {/* Main Grid */}
-      <main className="flex-1 grid grid-rows-[115px_1fr_180px] gap-4 p-4 overflow-hidden">
-        {/* Weather Cards */}
+      {/* Main Container */}
+      <main className="flex-1 flex flex-col gap-6 p-6">
+        {/* Weather Cards - Top row */}
         <section className="weather-cards">
           <WeatherCards data={weatherData} />
         </section>
 
         {/* Middle Section: Parallel Charts and Metrics */}
-        <section className="grid grid-cols-[1fr_1fr_300px] gap-4 min-h-0">
+        <section className="grid grid-cols-1 xl:grid-cols-[1fr_1fr_350px] gap-6">
           {/* Chart 1: Total Generation */}
-          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-4 rounded-xl flex flex-col overflow-hidden shadow-2xl group hover:border-white/10 transition-colors">
-            <div className="flex justify-between items-center mb-4 text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80">
+          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-5 rounded-2xl flex flex-col min-h-[400px] shadow-2xl group hover:border-white/10 transition-colors">
+            <div className="flex justify-between items-center mb-6 text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80">
               <h2 className="flex items-center gap-2">
                 <RefreshCw className={`w-3 h-3 ${weatherData ? '' : 'animate-spin'}`} />
                 Total Efficiency Forecast
@@ -214,57 +223,57 @@ const App = () => {
                 ))}
               </div>
             </div>
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-[250px] relative">
               <ForecastChart data={chartData} horizon={horizon} />
             </div>
           </div>
 
           {/* Chart 2: Division */}
-          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-4 rounded-xl flex flex-col overflow-hidden shadow-2xl group hover:border-white/10 transition-colors">
-             <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-4">Energy Type Division (Solar / Wind)</h2>
-            <div className="flex-1 min-h-0">
+          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-5 rounded-2xl flex flex-col min-h-[400px] shadow-2xl group hover:border-white/10 transition-colors">
+             <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-6">Energy Type Division (Solar / Wind)</h2>
+            <div className="flex-1 min-h-[250px] relative">
               <EnergyDistributionChart data={chartData} />
             </div>
           </div>
 
           {/* Metrics Column */}
-          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-4 rounded-xl flex flex-col overflow-hidden shadow-2xl group hover:border-white/10 transition-colors">
-            <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-4">Model Performance Matrix</h2>
-            <div className="flex-1 overflow-auto">
+          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-5 rounded-2xl flex flex-col min-h-[400px] shadow-2xl group hover:border-white/10 transition-colors">
+            <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-6">Model Performance Matrix</h2>
+            <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
               <MetricsTable currentHorizon={horizon} />
             </div>
           </div>
         </section>
 
         {/* Bottom Section: Logs */}
-        <section className="bg-card-bg border border-border rounded-lg flex flex-col overflow-hidden">
-          <div className="bg-bg/40 px-4 py-2 border-b border-border flex justify-between items-center shrink-0">
-            <h2 className="text-xs font-semibold text-text-main">Recent Prediction Audit Log</h2>
+        <section className="flex-1 min-h-[300px] bg-card-bg/60 backdrop-blur-md border border-white/5 rounded-2xl flex flex-col shadow-2xl overflow-hidden">
+          <div className="bg-bg/40 px-6 py-3 border-b border-white/5 flex justify-between items-center shrink-0">
+            <h2 className="text-[10px] uppercase font-black tracking-[0.4em] text-text-dim/80">Recent Prediction Audit Log</h2>
             <div className="flex items-center gap-3">
-              <span className="text-[10px] text-text-dim">Auto-refresh in {refreshTimer}s</span>
+              <span className="text-[9px] font-mono text-text-dim/40 uppercase tracking-widest">Auto-refresh in {refreshTimer}s</span>
               <button 
                 onClick={() => {
                   setRefreshTimer(30);
                   setIsRetraining(true);
                   setTimeout(() => setIsRetraining(false), 2000);
                 }}
-                className="text-text-dim hover:text-text-main transition-colors"
+                className="text-text-dim hover:text-text-main transition-colors p-1"
               >
-                <RefreshCw className={`w-3 h-3 ${isRetraining ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isRetraining ? 'animate-spin' : ''}`} />
               </button>
             </div>
           </div>
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto custom-scrollbar">
             <ForecastLog />
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="h-[40px] bg-card-bg border-t border-border flex items-center justify-between px-6 shrink-0 text-[11px] text-text-dim">
+      <footer className="h-[40px] bg-card-bg/90 backdrop-blur-md border-t border-border flex items-center justify-between px-6 shrink-0 text-[11px] text-text-dim sticky bottom-0 z-50">
         <div>
           Model: <span className="text-text-main">v1.2.0-stable</span> &nbsp;|&nbsp; 
-          Asset ID: <span className="text-text-main">ooty_solar_wind_001</span>
+          Asset ID: <span className="text-text-main uppercase">{assetId}</span>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
