@@ -16,29 +16,36 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ currentHorizon }) => {
     <table className="w-full border-collapse">
       <thead>
         <tr className="border-b border-border">
-          <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2">Horizon</th>
-          <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2">RMSE</th>
-          <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2">MAE</th>
-          <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2">vs Baseline</th>
+          <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2 pr-6">Horizon</th>
+          <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2 px-6">RMSE</th>
+          <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2 px-6">MAE</th>
+          <th className="text-left text-[11px] text-text-dim uppercase tracking-wider font-semibold py-2 pl-6">vs Baseline</th>
         </tr>
       </thead>
       <tbody>
         {metrics.map((m) => (
-          <tr key={m.horizon} className={`border-b border-border/40 transition-colors ${
-            currentHorizon === m.id ? 'bg-accent-blue/10' : ''
+          <tr key={m.horizon} className={`border-b border-border/20 transition-all duration-300 ${
+            currentHorizon === m.id ? 'bg-accent-blue/10 translate-x-1' : ''
           }`}>
-            <td className="py-3 text-[13px] text-text-main font-semibold">
+            <td className="py-4 text-[13px] text-text-main font-bold pr-6">
               <div className="flex items-center gap-2">
-                {currentHorizon === m.id && <div className="w-1.5 h-1.5 rounded-full bg-accent-blue" />}
+                {currentHorizon === m.id ? (
+                   <div className="w-2 h-2 rounded-full bg-accent-blue shadow-[0_0_8px_var(--accent-blue)]" />
+                ) : (
+                  <div className="w-2 h-2 rounded-full border border-border" />
+                )}
                 {m.horizon}
               </div>
             </td>
-            <td className="py-3 text-[13px] text-text-main font-mono">{m.rmse.toFixed(2)}</td>
-            <td className="py-3 text-[13px] text-text-main font-mono">{m.mae.toFixed(2)}</td>
-            <td className={`py-3 text-[13px] font-bold ${
+            <td className="py-4 text-[13px] text-text-main font-mono tracking-tighter tabular-nums px-6">{m.rmse.toFixed(2)}</td>
+            <td className="py-4 text-[13px] text-text-main font-mono tracking-tighter tabular-nums px-6">{m.mae.toFixed(2)}</td>
+            <td className={`py-4 text-[13px] font-black pl-6 ${
               m.status === 'better' ? 'text-accent-green' : 'text-accent-amber'
             }`}>
-              {m.improvement}
+              <span className="flex items-center gap-1">
+                {m.status === 'better' ? <TrendingDown className="w-3.5 h-3.5" /> : <TrendingUp className="w-3.5 h-3.5" />}
+                {m.improvement}
+              </span>
             </td>
           </tr>
         ))}

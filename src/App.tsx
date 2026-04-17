@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import WeatherCards from './components/WeatherCards';
 import ForecastChart from './components/ForecastChart';
+import EnergyDistributionChart from './components/EnergyDistributionChart';
 import MetricsTable from './components/MetricsTable';
 import ForecastLog from './components/ForecastLog';
 import { getLiveWeather, getHealth, searchLocation } from './frontend/src/api/client';
@@ -37,6 +38,7 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [refreshTimer, setRefreshTimer] = useState(30);
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -51,10 +53,14 @@ const App = () => {
     fetchWeather();
     const interval = setInterval(fetchWeather, 30000);
     const timeInterval = setInterval(() => setCurrentTime(new Date()), 1000);
+    const countdown = setInterval(() => {
+      setRefreshTimer((prev) => (prev <= 1 ? 30 : prev - 1));
+    }, 1000);
 
     return () => {
       clearInterval(interval);
       clearInterval(timeInterval);
+      clearInterval(countdown);
     };
   }, [selectedLocation]);
 
@@ -73,15 +79,37 @@ const App = () => {
   };
 
   const chartData = Array.from({ length: 24 }).map((_, i) => {
-    // Basic deterministic variability based on location
     const mod = (selectedLocation.lat + selectedLocation.lon) % 50;
-    // Horizon shifts the prediction scale to show the buttons work
     const horizonMultiplier = horizon === '1h' ? 1.0 : horizon === '3h' ? 1.2 : 0.8;
     
+    // Synchronize timestamps with the logic from Audit Log (last 24 hours ending now)
+    const logTime = new Date(currentTime);
+    logTime.setHours(currentTime.getHours() - (24 - i));
+    logTime.setMinutes(0);
+    const labelTime = logTime.toTimeString().split(':')[0] + ':00';
+
+    // Solar: Peaks during the day
+    const solarBase = Math.max(0, Math.sin((logTime.getHours() - 6) * Math.PI / 12) * 150);
+    // Wind: Variable but present
+    const windBase = 60 + Math.random() * 30 + Math.cos(logTime.getHours() / 3) * 20;
+    // Hydro: Very stable, slight variation based on city (elevation)
+    const hydroBase = 100 + (mod * 2);
+    // Tidal: Cyclical based on 12-hour tide cycles
+    const tidalBase = 40 + Math.sin(logTime.getHours() * Math.PI / 6) * 30;
+    
+    const sActual = (solarBase + Math.random() * 15) * horizonMultiplier;
+    const wActual = (windBase + Math.random() * 15) * horizonMultiplier;
+    const hActual = (hydroBase + Math.random() * 5) * horizonMultiplier;
+    const tActual = (tidalBase + Math.random() * 10) * horizonMultiplier;
+    
     return {
-      time: `${String(i).padStart(2, '0')}:00`,
-      observed: (200 + mod + Math.random() * 80 + Math.sin(i/4) * 50) * horizonMultiplier,
-      predicted: (200 + mod + Math.random() * 80 + Math.sin(i/4) * 50 + (Math.random() - 0.5) * 15) * horizonMultiplier,
+      time: labelTime,
+      solar: sActual,
+      wind: wActual,
+      hydro: hActual,
+      tidal: tActual,
+      totalObserved: sActual + wActual + hActual + tActual,
+      totalPredicted: (sActual + wActual + hActual + tActual) + (Math.random() - 0.5) * 20,
     };
   });
 
@@ -155,28 +183,30 @@ const App = () => {
       </header>
 
       {/* Main Grid */}
-      <main className="flex-1 grid grid-rows-[120px_1.5fr_180px] gap-4 p-4 overflow-hidden">
+      <main className="flex-1 grid grid-rows-[115px_1fr_180px] gap-4 p-4 overflow-hidden">
         {/* Weather Cards */}
         <section className="weather-cards">
           <WeatherCards data={weatherData} />
         </section>
 
-        {/* Middle Section: Chart and Metrics */}
-        <section className="grid grid-cols-[1.8fr_1fr] gap-4 overflow-hidden">
-          <div className="bg-card-bg border border-border rounded-lg p-5 flex flex-col overflow-hidden">
-            <div className="flex justify-between items-center mb-4 text-sm font-semibold text-text-main">
-              <div className="flex items-center gap-2">
-                <h2>Energy Output Forecast (kWh)</h2>
-              </div>
+        {/* Middle Section: Parallel Charts and Metrics */}
+        <section className="grid grid-cols-[1fr_1fr_300px] gap-4 min-h-0">
+          {/* Chart 1: Total Generation */}
+          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-4 rounded-xl flex flex-col overflow-hidden shadow-2xl group hover:border-white/10 transition-colors">
+            <div className="flex justify-between items-center mb-4 text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80">
+              <h2 className="flex items-center gap-2">
+                <RefreshCw className={`w-3 h-3 ${weatherData ? '' : 'animate-spin'}`} />
+                Total Efficiency Forecast
+              </h2>
               <div className="flex gap-1">
                 {['1h', '3h', '24h'].map(h => (
                   <button 
                     key={h}
                     onClick={() => setHorizon(h)}
-                    className={`px-3 py-1 text-xs rounded border transition-all ${
+                    className={`px-2 py-0.5 text-[9px] font-black uppercase rounded border transition-all ${
                       horizon === h 
-                      ? 'bg-accent-blue border-accent-blue text-white' 
-                      : 'bg-bg border-border text-text-dim hover:border-text-dim/50'
+                      ? 'bg-accent-blue border-accent-blue text-white shadow-[0_0_8px_rgba(59,130,246,0.5)]' 
+                      : 'bg-bg/50 border-border text-text-dim hover:border-text-dim/50'
                     }`}
                   >
                     {h}
@@ -189,31 +219,19 @@ const App = () => {
             </div>
           </div>
 
-          <div className="bg-card-bg border border-border rounded-lg p-5 flex flex-col overflow-hidden">
-            <h2 className="text-sm font-semibold text-text-main mb-4">Model Performance Matrix</h2>
+          {/* Chart 2: Division */}
+          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-4 rounded-xl flex flex-col overflow-hidden shadow-2xl group hover:border-white/10 transition-colors">
+             <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-4">Energy Type Division (Solar / Wind)</h2>
+            <div className="flex-1 min-h-0">
+              <EnergyDistributionChart data={chartData} />
+            </div>
+          </div>
+
+          {/* Metrics Column */}
+          <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-4 rounded-xl flex flex-col overflow-hidden shadow-2xl group hover:border-white/10 transition-colors">
+            <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-4">Model Performance Matrix</h2>
             <div className="flex-1 overflow-auto">
               <MetricsTable currentHorizon={horizon} />
-            </div>
-            <div className="mt-4 p-3 border border-dashed border-border rounded text-center relative hover:bg-white/5 transition-colors">
-              <input 
-                type="file" 
-                accept=".csv"
-                onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    setIsRetraining(true);
-                    setTimeout(() => {
-                      setIsRetraining(false);
-                      alert("Model successfully retrained with uploaded CSV data.");
-                    }, 2000);
-                  }
-                }}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-              <p className="text-[11px] text-text-dim flex items-center justify-center gap-2 uppercase font-bold tracking-tighter">
-                <Upload className="w-3 h-3" />
-                {isRetraining ? 'Processing...' : 'Upload CSV for Model Retraining'}
-              </p>
-              <p className="text-[9px] text-text-dim/60 mt-1">Refines prediction logic using historical region data</p>
             </div>
           </div>
         </section>
@@ -223,9 +241,10 @@ const App = () => {
           <div className="bg-bg/40 px-4 py-2 border-b border-border flex justify-between items-center shrink-0">
             <h2 className="text-xs font-semibold text-text-main">Recent Prediction Audit Log</h2>
             <div className="flex items-center gap-3">
-              <span className="text-[10px] text-text-dim">Auto-refresh in 22s</span>
+              <span className="text-[10px] text-text-dim">Auto-refresh in {refreshTimer}s</span>
               <button 
                 onClick={() => {
+                  setRefreshTimer(30);
                   setIsRetraining(true);
                   setTimeout(() => setIsRetraining(false), 2000);
                 }}
