@@ -3,8 +3,8 @@
 A production-ready hybrid solar-wind energy forecasting system designed for the unique climate of Ooty, Tamil Nadu. This system uses a stacking ensemble of XGBoost and LSTM models to provide accurate energy generation predictions.
 
 ## 🌍 Location Context
-- **Primary location:** Ooty, Tamil Nadu, India (Lat: 11.4102° N, Lon: 76.6950° E)
-- **Energy asset:** Solar (500kW) + Wind (1200kW) hybrid plant.
+- **Sample location:** Ooty, Tamil Nadu, India (Lat: 11.4102° N, Lon: 76.6950° E)
+- **Energy asset:** Solar (500kW) + Wind (1200kW) + Hydro-power + Tidal hybrid plant.
 - **Timezone:** Asia/Kolkata (IST, UTC+5:30)
 
 ## 📁 Repository Structure
@@ -89,3 +89,6 @@ curl -X POST http://localhost:8000/predict/single \
 
 ## ✅ License
 Apache-2.0
+
+Live link
+https://renewable-energy-forecast-system-403592674840.us-west1.run.app/
