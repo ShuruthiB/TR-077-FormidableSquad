@@ -3,13 +3,18 @@ import { TrendingUp, TrendingDown, Info } from 'lucide-react';
 
 interface MetricsTableProps {
   currentHorizon: string;
+  selectedLocation: any;
 }
 
-const MetricsTable: React.FC<MetricsTableProps> = ({ currentHorizon }) => {
+const MetricsTable: React.FC<MetricsTableProps> = ({ currentHorizon, selectedLocation }) => {
+  // Use location coordinates to seed the metrics so they are predictably different per city
+  const seed = (selectedLocation?.lat || 0) + (selectedLocation?.lon || 0);
+  const drift = Math.abs(Math.sin(seed) * 5);
+  
   const metrics = [
-    { id: '1h', horizon: '1h Forecast', rmse: 14.22, mae: 10.84, improvement: '-12.4%', status: 'better' },
-    { id: '3h', horizon: '3h Forecast', rmse: 28.51, mae: 19.10, improvement: '-8.2%', status: 'better' },
-    { id: '24h', horizon: '24h Forecast', rmse: 52.30, mae: 41.12, improvement: '-2.1%', status: 'stable' },
+    { id: '1h', horizon: '1h Forecast', rmse: 12.22 + drift, mae: 8.84 + (drift * 0.7), improvement: `-${(10 + drift).toFixed(1)}%`, status: 'better' },
+    { id: '3h', horizon: '3h Forecast', rmse: 24.51 + (drift * 2), mae: 17.10 + (drift * 1.5), improvement: `-${(6 + (drift/2)).toFixed(1)}%`, status: 'better' },
+    { id: '24h', horizon: '24h Forecast', rmse: 48.30 + (drift * 4), mae: 38.12 + (drift * 3), improvement: `-${(2 + (drift/4)).toFixed(1)}%`, status: drift > 4 ? 'stable' : 'better' },
   ];
 
   return (

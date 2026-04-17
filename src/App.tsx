@@ -95,28 +95,34 @@ const App = () => {
     logTime.setMinutes(0);
     const labelTime = logTime.toTimeString().split(':')[0] + ':00';
 
-    // Solar: Peaks during the day
-    const solarBase = Math.max(0, Math.sin((logTime.getHours() - 6) * Math.PI / 12) * 150);
-    // Wind: Variable but present
-    const windBase = 60 + Math.random() * 30 + Math.cos(logTime.getHours() / 3) * 20;
-    // Hydro: Very stable, slight variation based on city (elevation)
-    const hydroBase = 100 + (mod * 2);
-    // Tidal: Cyclical based on 12-hour tide cycles
-    const tidalBase = 40 + Math.sin(logTime.getHours() * Math.PI / 6) * 30;
+    // Solar: Peaks during the day, influenced by latitude (simulating distance from equator)
+    const latFactor = 1 - Math.abs(selectedLocation.lat / 90);
+    const solarBase = Math.max(0, Math.sin((logTime.getHours() - 6) * Math.PI / 12) * 200 * latFactor);
     
-    const sActual = (solarBase + Math.random() * 15) * horizonMultiplier;
+    // Wind: Variable, influenced by longitude (simulating regional wind patterns)
+    const lonFactor = 0.5 + Math.abs(selectedLocation.lon % 30) / 30;
+    const windBase = (40 + Math.random() * 40 + Math.cos(logTime.getHours() / 3) * 20) * lonFactor;
+    
+    // Hydro: Very stable, variation based on city elevation proxy (using mod)
+    const hydroBase = 80 + (mod * 3);
+    
+    // Tidal: Cyclical, only "present" if some coordinate condition is met (simulating coastal)
+    const isCoastal = (Math.floor(selectedLocation.lat + selectedLocation.lon) % 2 === 0);
+    const tidalBase = isCoastal ? (30 + Math.sin(logTime.getHours() * Math.PI / 6) * 40) : 0;
+    
+    const sActual = (solarBase + Math.random() * 10) * horizonMultiplier;
     const wActual = (windBase + Math.random() * 15) * horizonMultiplier;
-    const hActual = (hydroBase + Math.random() * 5) * horizonMultiplier;
-    const tActual = (tidalBase + Math.random() * 10) * horizonMultiplier;
+    const hActual = (hydroBase + Math.random() * 3) * horizonMultiplier;
+    const tActual = (tidalBase + Math.random() * 5) * horizonMultiplier;
     
     return {
       time: labelTime,
-      solar: sActual,
-      wind: wActual,
-      hydro: hActual,
-      tidal: tActual,
+      solar: Math.max(0, sActual),
+      wind: Math.max(0, wActual),
+      hydro: Math.max(0, hActual),
+      tidal: Math.max(0, tActual),
       totalObserved: sActual + wActual + hActual + tActual,
-      totalPredicted: (sActual + wActual + hActual + tActual) + (Math.random() - 0.5) * 20,
+      totalPredicted: (sActual + wActual + hActual + tActual) + (Math.random() - 0.5) * (horizon === '24h' ? 50 : 20),
     };
   });
 
@@ -230,7 +236,7 @@ const App = () => {
 
           {/* Chart 2: Division */}
           <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-5 rounded-2xl flex flex-col min-h-[400px] shadow-2xl group hover:border-white/10 transition-colors">
-             <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-6">Energy Type Division (Solar / Wind)</h2>
+             <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-6">Energy Type Division (All Sources)</h2>
             <div className="flex-1 min-h-[250px] relative">
               <EnergyDistributionChart data={chartData} />
             </div>
@@ -240,7 +246,7 @@ const App = () => {
           <div className="bg-card-bg/60 backdrop-blur-md border border-white/5 p-5 rounded-2xl flex flex-col min-h-[400px] shadow-2xl group hover:border-white/10 transition-colors">
             <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-text-dim/80 mb-6">Model Performance Matrix</h2>
             <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
-              <MetricsTable currentHorizon={horizon} />
+              <MetricsTable currentHorizon={horizon} selectedLocation={selectedLocation} />
             </div>
           </div>
         </section>
@@ -264,7 +270,7 @@ const App = () => {
             </div>
           </div>
           <div className="flex-1 overflow-auto custom-scrollbar">
-            <ForecastLog />
+            <ForecastLog selectedLocation={selectedLocation} />
           </div>
         </section>
       </main>

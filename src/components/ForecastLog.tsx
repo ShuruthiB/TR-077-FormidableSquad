@@ -1,17 +1,20 @@
 import React from 'react';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
-const ForecastLog = () => {
+interface ForecastLogProps {
+  selectedLocation: any;
+}
+
+const ForecastLog: React.FC<ForecastLogProps> = ({ selectedLocation }) => {
   const now = new Date();
+  const lat = selectedLocation?.lat || 0;
+  const lon = selectedLocation?.lon || 0;
   
   // Generate logs for the last 4 hours dynamically in IST
   const logs = [0, 1, 2, 3].map((hourOffset) => {
     const logTime = new Date(now);
-    // Shift the hours based on the offset to get the correct IST hour
-    // The environment is roughly -07:00, IST is +05:30. Difference is 12.5 hours.
     logTime.setHours(now.getHours() - (hourOffset + 1));
     
-    // Use Intl to format the date correctly for Asia/Kolkata
     const formatter = new Intl.DateTimeFormat('en-IN', {
       timeZone: 'Asia/Kolkata',
       year: 'numeric',
@@ -32,21 +35,24 @@ const ForecastLog = () => {
     const dateStr = `${y}-${m}-${d}`;
     const timeStr = `${h}:00:00`;
     
-    // Seeded random for consistency
-    const seed = parseInt(h || '0') + parseInt(d || '0');
-    const noise = Math.sin(seed) * 5;
-    const predicted = 550 + noise + (Math.random() * 20); // Higher values for 4 sources
-    const actual = predicted + (Math.random() * 12 - 6);
+    // Seeded random for consistency based on location AND time
+    const seed = parseInt(h || '0') + parseInt(d || '0') + Math.floor(lat) + Math.floor(lon);
+    const locNoise = Math.sin(lat + lon) * 50; 
+    const timeNoise = Math.cos(seed) * 10;
+    
+    // Base values are influenced by location coordinates
+    const predicted = 450 + locNoise + timeNoise + (Math.random() * 20); 
+    const actual = predicted + (Math.random() * 16 - 8);
     const errorVal = ((actual - predicted) / predicted) * 100;
     
     return {
       id: hourOffset,
       time: `${dateStr} ${timeStr}`,
       horizon: hourOffset % 2 === 0 ? '1h' : '3h',
-      predicted,
-      actual,
+      predicted: Math.max(0, predicted),
+      actual: Math.max(0, actual),
       error: `${errorVal > 0 ? '+' : ''}${errorVal.toFixed(2)}%`,
-      status: Math.abs(errorVal) < 3.5 ? 'ACCURATE' : 'MARGINAL'
+      status: Math.abs(errorVal) < 2.5 ? 'ACCURATE' : 'MARGINAL'
     };
   });
 
